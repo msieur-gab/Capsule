@@ -1,0 +1,184 @@
+/* styles/main.css */
+:root {
+    /* Color variables */
+    --color-background: #ffffff;
+    --color-text: #1a1a1a;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #e5e5e5;
+    --color-gray-300: #d4d4d4;
+    --color-gray-400: #a3a3a3;
+    --color-gray-500: #737373;
+    --color-error: #dc2626;
+    --color-success: #16a34a;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Typography */
+    --font-family: system-ui, -apple-system, sans-serif;
+    --line-height: 1.5;
+}
+
+/* Reset and base styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: var(--font-family);
+    line-height: var(--line-height);
+    color: var(--color-text);
+    background: var(--color-background);
+}
+
+body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Layout */
+body > header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-md);
+    height: 100%;
+}
+
+aside {
+    border-right: 1px solid var(--color-gray-200);
+    padding: var(--spacing-md);
+}
+
+/* Components */
+button {
+    background: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-radius: 4px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background: var(--color-gray-200);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dialog styles */
+dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+dialog header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+dialog footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+}
+
+/* Form elements */
+fieldset {
+    border: 1px solid var(--color-gray-200);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+}
+
+legend {
+    padding: 0 var(--spacing-sm);
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Timeline specific styles */
+#timelineNav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+#timelineNav button {
+    text-align: left;
+    width: 100%;
+}
+
+.timeline-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Utility classes */
+.error {
+    color: var(--color-error);
+}
+
+.success {
+    color: var(--color-success);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+    
+    aside {
+        border-right: none;
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+}

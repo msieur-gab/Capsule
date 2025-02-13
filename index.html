@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Notes</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Load localforage before any other scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Timeline Notes</h1>
+        <nav>
+            <button type="button" id="newTimelineBtn">New Timeline</button>
+            <button type="button" id="importBtn">Import</button>
+            <button type="button" id="exportBtn">Export</button>
+        </nav>
+    </header>
+
+    <main>
+        <aside id="timelineList">
+            <header>
+                <h2>Your Timelines</h2>
+            </header>
+            <nav id="timelineNav">
+                <!-- Timeline navigation items -->
+            </nav>
+        </aside>
+
+        <section id="activeTimeline">
+            <header>
+                <h2 id="timelineTitle">Select a Timeline</h2>
+                <div class="timeline-controls">
+                    <button type="button" id="newRecordBtn" disabled>New Record</button>
+                </div>
+            </header>
+            <timeline-manager id="timelineManager"></timeline-manager>
+        </section>
+    </main>
+
+    <dialog id="newRecordDialog">
+        <form method="dialog">
+            <header>
+                <h3>New Record</h3>
+                <button type="button" class="close-button">×</button>
+            </header>
+            <fieldset>
+                <legend>Record Type</legend>
+                <label>
+                    <input type="radio" name="recordType" value="text" checked>
+                    Text Note
+                </label>
+                <label>
+                    <input type="radio" name="recordType" value="audio">
+                    Voice Note
+                </label>
+                <label>
+                    <input type="radio" name="recordType" value="image">
+                    Image Note
+                </label>
+            </fieldset>
+            <div class="editor-container">
+                <!-- Editor component will be dynamically inserted here -->
+            </div>
+            <footer>
+                <button type="submit">Save</button>
+                <button type="button" class="secondary">Cancel</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
