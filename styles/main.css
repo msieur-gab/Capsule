@@ -21,6 +21,10 @@
     /* Typography */
     --font-family: system-ui, -apple-system, sans-serif;
     --line-height: 1.5;
+    
+    /* Layout */
+    --header-height: 60px;
+    --sidebar-width: 250px;
 }
 
 /* Reset and base styles */
@@ -30,18 +34,18 @@
     padding: 0;
 }
 
-html {
+html, body {
+    height: 100%;
+    overflow: hidden; /* Prevent body scrolling */
+}
+
+body {
     font-family: var(--font-family);
     line-height: var(--line-height);
     color: var(--color-text);
     background: var(--color-background);
-}
-
-body {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Typography */
@@ -52,23 +56,59 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Layout */
 body > header {
+    height: var(--header-height);
     padding: var(--spacing-md);
     border-bottom: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 main {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    gap: var(--spacing-md);
-    height: 100%;
+    flex: 1;
+    display: flex;
+    overflow: hidden; /* Contains the scrolling elements */
 }
 
 aside {
+    width: var(--sidebar-width);
     border-right: 1px solid var(--color-gray-200);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+aside header {
     padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+#timelineNav {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+#activeTimeline {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#activeTimeline header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+timeline-manager {
+    flex: 1;
+    overflow-y: auto;
 }
 
 /* Components */
@@ -89,6 +129,23 @@ button:hover {
 button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Timeline navigation */
+#timelineNav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+#timelineNav button {
+    text-align: left;
+    width: 100%;
+}
+
+#timelineNav button.active {
+    background-color: var(--color-gray-200);
+    font-weight: 500;
 }
 
 /* Dialog styles */
@@ -144,41 +201,49 @@ label {
     margin-bottom: var(--spacing-sm);
 }
 
-/* Timeline specific styles */
-#timelineNav {
+/* Utility classes */
+.error { color: var(--color-error); }
+.success { color: var(--color-success); }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+    
+    aside {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    #timelineNav {
+        max-height: 200px;
+    }
+}
+
+/* Custome date selector */
+
+.datetime-selector {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.datetime-selector label {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
 }
 
-#timelineNav button {
-    text-align: left;
-    width: 100%;
+.datetime-selector input {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: 4px;
+    font-family: inherit;
 }
 
-.timeline-controls {
-    display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-}
-
-/* Utility classes */
-.error {
-    color: var(--color-error);
-}
-
-.success {
-    color: var(--color-success);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    main {
-        grid-template-columns: 1fr;
-    }
-    
-    aside {
-        border-right: none;
-        border-bottom: 1px solid var(--color-gray-200);
-    }
+.datetime-selector input:focus {
+    outline: none;
+    border-color: var(--color-gray-400);
 }

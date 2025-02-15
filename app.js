@@ -157,24 +157,46 @@ cancelButton.addEventListener('click', () => {
         input.click();
     }
 
-    async handleSaveRecord(event) {
-        const { content, type } = event.detail;
-        if (!this.currentTimelineId) return;
+    // async handleSaveRecord(event) {
+    //     const { content, type } = event.detail;
+    //     if (!this.currentTimelineId) return;
         
-        try {
-            await this.storage.addRecord(this.currentTimelineId, { type, content });
-            this.newRecordDialog.close();
+    //     try {
+    //         await this.storage.addRecord(this.currentTimelineId, { type, content });
+    //         this.newRecordDialog.close();
             
-            // Make sure to reload the timeline manager's content
-            const timelineManager = document.getElementById('timelineManager');
-            await timelineManager.loadTimeline(this.currentTimelineId);
+    //         // Make sure to reload the timeline manager's content
+    //         const timelineManager = document.getElementById('timelineManager');
+    //         await timelineManager.loadTimeline(this.currentTimelineId);
             
-            this.showNotification('Record saved successfully', 'success');
-        } catch (error) {
-            console.error('Error saving record:', error);
-            this.showNotification('Failed to save record', 'error');
-        }
+    //         this.showNotification('Record saved successfully', 'success');
+    //     } catch (error) {
+    //         console.error('Error saving record:', error);
+    //         this.showNotification('Failed to save record', 'error');
+    //     }
+    // }
+
+    // Update this method in app.js
+async handleSaveRecord(event) {
+    const { content, type, createdAt } = event.detail;
+    if (!this.currentTimelineId) return;
+    
+    try {
+        // Create the record with the provided datetime
+        await this.storage.addRecord(this.currentTimelineId, { 
+            type, 
+            content,
+            createdAt: createdAt // Use the datetime from the event
+        });
+        
+        this.newRecordDialog.close();
+        await this.loadTimeline(this.currentTimelineId);
+        this.showNotification('Record saved successfully', 'success');
+    } catch (error) {
+        console.error('Error saving record:', error);
+        this.showNotification('Failed to save record', 'error');
     }
+}
 
     async exportTimeline() {
         if (!this.currentTimelineId) return;
@@ -199,10 +221,33 @@ cancelButton.addEventListener('click', () => {
         }
     }
 
+// showNewRecordDialog() {
+//     console.log('Opening new record dialog');
+//     const dialog = this.newRecordDialog;
+//     dialog.querySelector('form').reset();
+    
+//     // Initialize with text editor
+//     this.handleRecordTypeChange('text');
+    
+//     dialog.showModal();
+// }
+
 showNewRecordDialog() {
     console.log('Opening new record dialog');
     const dialog = this.newRecordDialog;
-    dialog.querySelector('form').reset();
+    const form = dialog.querySelector('form');
+    form.reset();
+    
+    // Set default datetime to current time
+    const datetimeInput = dialog.querySelector('input[name="recordDateTime"]');
+    const now = new Date();
+    // Format datetime for input: YYYY-MM-DDThh:mm
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    datetimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
     
     // Initialize with text editor
     this.handleRecordTypeChange('text');
@@ -219,20 +264,25 @@ handleRecordTypeChange(type) {
     container.appendChild(editor);
 }
 
-    async handleSaveRecord(event) {
-        const { content, type } = event.detail;
-        if (!this.currentTimelineId) return;
+
+    // async handleEditRecord(event) {
+    //     const { record, timelineId } = event.detail;
+    //     const dialog = this.newRecordDialog;
         
-        try {
-            await this.storage.addRecord(this.currentTimelineId, { type, content });
-            this.newRecordDialog.close();
-            await this.loadTimeline(this.currentTimelineId);
-            this.showNotification('Record saved successfully', 'success');
-        } catch (error) {
-            console.error('Error saving record:', error);
-            this.showNotification('Failed to save record', 'error');
-        }
-    }
+    //     // Set record type
+    //     dialog.querySelector(`input[value="${record.type}"]`).checked = true;
+        
+    //     // Initialize editor
+    //     this.handleRecordTypeChange(record.type);
+    //     const editor = dialog.querySelector(`${record.type}-editor`);
+    //     editor.setAttribute('content', record.content);
+        
+    //     // Store record ID for update
+    //     dialog.dataset.recordId = record.id;
+    //     dialog.dataset.timelineId = timelineId;
+        
+    //     dialog.showModal();
+    // }
 
     async handleEditRecord(event) {
         const { record, timelineId } = event.detail;
@@ -240,6 +290,16 @@ handleRecordTypeChange(type) {
         
         // Set record type
         dialog.querySelector(`input[value="${record.type}"]`).checked = true;
+        
+        // Set datetime
+        const datetimeInput = dialog.querySelector('input[name="recordDateTime"]');
+        const recordDate = new Date(record.createdAt);
+        const year = recordDate.getFullYear();
+        const month = String(recordDate.getMonth() + 1).padStart(2, '0');
+        const day = String(recordDate.getDate()).padStart(2, '0');
+        const hours = String(recordDate.getHours()).padStart(2, '0');
+        const minutes = String(recordDate.getMinutes()).padStart(2, '0');
+        datetimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
         
         // Initialize editor
         this.handleRecordTypeChange(record.type);
@@ -252,6 +312,26 @@ handleRecordTypeChange(type) {
         
         dialog.showModal();
     }
+    
+
+    // async handleRecordUpdate(event) {
+    //     const { record, timelineId, action } = event.detail;
+        
+    //     try {
+    //         if (action === 'delete') {
+    //             await this.storage.deleteRecord(timelineId, record.id);
+    //             this.showNotification('Record deleted successfully', 'success');
+    //         } else if (action === 'update') {
+    //             await this.storage.updateRecord(timelineId, record.id, record);
+    //             this.showNotification('Record updated successfully', 'success');
+    //         }
+            
+    //         await this.loadTimeline(timelineId);
+    //     } catch (error) {
+    //         console.error('Error updating record:', error);
+    //         this.showNotification('Failed to update record', 'error');
+    //     }
+    // }
 
     async handleRecordUpdate(event) {
         const { record, timelineId, action } = event.detail;
@@ -261,7 +341,16 @@ handleRecordTypeChange(type) {
                 await this.storage.deleteRecord(timelineId, record.id);
                 this.showNotification('Record deleted successfully', 'success');
             } else if (action === 'update') {
-                await this.storage.updateRecord(timelineId, record.id, record);
+                // Get the selected datetime
+                const datetimeInput = this.newRecordDialog.querySelector('input[name="recordDateTime"]');
+                const customDate = new Date(datetimeInput.value);
+                
+                const updatedRecord = {
+                    ...record,
+                    createdAt: customDate.toISOString()
+                };
+                
+                await this.storage.updateRecord(timelineId, record.id, updatedRecord);
                 this.showNotification('Record updated successfully', 'success');
             }
             

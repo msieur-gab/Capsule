@@ -42,10 +42,19 @@ export class BaseEditor extends HTMLElement {
     }
 
     dispatchSave(content, type) {
+        // Get the datetime from the dialog
+        const dialog = document.querySelector('#newRecordDialog');
+        const datetimeInput = dialog.querySelector('input[name="recordDateTime"]');
+        const customDate = datetimeInput ? new Date(datetimeInput.value) : new Date();
+
         this.dispatchEvent(new CustomEvent('save-record', {
             bubbles: true,
             composed: true,
-            detail: { content, type }
+            detail: { 
+                content, 
+                type,
+                createdAt: customDate.toISOString() 
+            }
         }));
     }
 
@@ -57,12 +66,10 @@ export class BaseEditor extends HTMLElement {
         }));
     }
 
-    // Default save method - should be overridden by child classes
     save() {
         throw new Error('Save method must be implemented by child class');
     }
 
-    // Default cleanup method - can be overridden by child classes if needed
     cleanup() {
         // Default cleanup implementation
     }

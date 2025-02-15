@@ -54,40 +54,38 @@ export class StorageManager {
         return this.timelineStores.get(timelineId);
     }
     
-    async addRecord(timelineId, record) {
-        console.log('Adding record to timeline:', timelineId);
-        console.log('Record data:', record);
+// Update this method in storage.js
+async addRecord(timelineId, record) {
+    console.log('Adding record to timeline:', timelineId);
+    console.log('Record data:', record);
+    
+    const store = await this.getTimelineStore(timelineId);
+    console.log('Got timeline store:', store);
+    
+    const recordId = `record_${Date.now()}`;
+    const newRecord = {
+        id: recordId,
+        ...record,
+        createdAt: record.createdAt || new Date().toISOString() // Use provided date or current date as fallback
+    };
+    
+    console.log('Saving new record:', newRecord);
+    
+    try {
+        await store.setItem(recordId, newRecord);
+        console.log('Record saved successfully');
         
-        const store = await this.getTimelineStore(timelineId);
-        console.log('Got timeline store:', store);
+        // Update timeline metadata
+        const timeline = await this.timelineStore.getItem(timelineId);
+        timeline.updatedAt = new Date().toISOString();
+        await this.timelineStore.setItem(timelineId, timeline);
         
-        const recordId = `record_${Date.now()}`;
-        const newRecord = {
-            id: recordId,
-            ...record,
-            createdAt: new Date().toISOString()
-        };
-        
-        console.log('Saving new record:', newRecord);
-        
-        try {
-            await store.setItem(recordId, newRecord);
-            console.log('Record saved successfully');
-            
-            // Update timeline metadata
-            const timeline = await this.timelineStore.getItem(timelineId);
-            console.log('Current timeline:', timeline);
-            
-            timeline.updatedAt = new Date().toISOString();
-            await this.timelineStore.setItem(timelineId, timeline);
-            console.log('Timeline updated');
-            
-            return newRecord;
-        } catch (error) {
-            console.error('Error saving record:', error);
-            throw error;
-        }
+        return newRecord;
+    } catch (error) {
+        console.error('Error saving record:', error);
+        throw error;
     }
+}
     
     async getRecords(timelineId) {
         console.log('Getting records for timeline:', timelineId);

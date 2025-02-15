@@ -5,20 +5,6 @@ export class TimelineRecord extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.expanded = false;
-    }
-
-    set record(value) {
-        this._record = value;
-        this.render();
-    }
-
-    get record() {
-        return this._record;
-    }
-
-    set timelineId(value) {
-        this._timelineId = value;
     }
 
     static get styles() {
@@ -33,8 +19,6 @@ export class TimelineRecord extends HTMLElement {
                 border-radius: 8px;
                 padding: 1rem;
                 position: relative;
-                cursor: pointer;
-                transition: box-shadow 0.2s ease;
             }
 
             .record:hover {
@@ -45,21 +29,13 @@ export class TimelineRecord extends HTMLElement {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                gap: 1rem;
-            }
-
-            .record-title {
-                font-weight: 500;
-                flex-grow: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                margin-bottom: 0.5rem;
             }
 
             .record-time {
                 font-size: 0.875rem;
                 color: var(--color-gray-500, #737373);
-                white-space: nowrap;
+                margin-bottom: 0.5rem;
             }
 
             .record-metadata {
@@ -75,40 +51,13 @@ export class TimelineRecord extends HTMLElement {
             }
 
             .record-content {
-                margin-top: 1rem;
-                overflow: hidden;
-                max-height: 0;
-                opacity: 0;
-                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin-top 0.3s ease-out;
-            }
-
-            .record.expanded .record-content {
-                max-height: 2000px;
-                opacity: 1;
-                margin-top: 1rem;
-            }
-
-            .expand-icon {
-            font-size:1.2em;
-                transition: transform 0.3s ease;
-                margin-right: 0.5rem;
-            }
-
-            .record.expanded .expand-icon {
-                transform: rotate(45deg);
+                margin-bottom: 1rem;
             }
 
             .controls {
                 display: flex;
                 gap: 0.5rem;
                 justify-content: flex-end;
-                margin-top: 1rem;
-                opacity: 0;
-                transition: opacity 0.2s ease;
-            }
-
-            .record.expanded .controls {
-                opacity: 1;
             }
 
             button {
@@ -134,31 +83,28 @@ export class TimelineRecord extends HTMLElement {
 
             .image-content img {
                 max-width: 100%;
+                max-height: 300px; /* Control maximum height */
+                width: auto; /* Maintain aspect ratio */
+                height: auto; /* Maintain aspect ratio */
+                object-fit: contain; /* Ensure whole image is visible */
                 border-radius: 4px;
+                display: block; /* Remove any extra space below image */
+                /* Center the image */
+                /* margin: 0 auto; */
+                margin: 0 ; 
             }
 
-            .text-content h1 {
-                font-size: 1.5em;
+            .text-content h1, .text-content h2, .text-content h3, .text-content h4 {
                 margin: 0.25em 0;
             }
 
-            .text-content h2 {
-                font-size: 1.3em;
-                margin: 0.25em 0;
-            }
-
-            .text-content h3 {
-                font-size: 1.1em;
-                margin: 0.05em 0;
-            }
-
-            .text-content h4 {
-                font-size: 1em;
-                margin: 0.05em 0;
-            }
+            .text-content h1 { font-size: 1.5em; }
+            .text-content h2 { font-size: 1.3em; }
+            .text-content h3 { font-size: 1.1em; }
+            .text-content h4 { font-size: 1em; }
 
             .text-content code {
-                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                font-family: monospace;
                 background-color: var(--color-gray-100);
                 padding: 0.2rem 0.4rem;
                 border-radius: 4px;
@@ -170,28 +116,17 @@ export class TimelineRecord extends HTMLElement {
         `;
     }
 
-    extractTitle() {
-        if (this.record.type === 'text') {
-            // Try to find first heading or first line
-            const content = this.record.content;
-            const headingMatch = content.match(/^#+ (.+)$/m);
-            if (headingMatch) return headingMatch[1];
-            
-            // Get first line, limited to 50 characters
-            const firstLine = content.split('\n')[0];
-            return firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : firstLine;
-        }
-        return `${this.record.type.charAt(0).toUpperCase() + this.record.type.slice(1)} note`;
+    set record(value) {
+        this._record = value;
+        this.render();
     }
 
-    toggleExpanded() {
-        this.expanded = !this.expanded;
-        const record = this.shadowRoot.querySelector('.record');
-        if (this.expanded) {
-            record.classList.add('expanded');
-        } else {
-            record.classList.remove('expanded');
-        }
+    get record() {
+        return this._record;
+    }
+
+    set timelineId(value) {
+        this._timelineId = value;
     }
 
     calculateSize(content, type) {
@@ -288,45 +223,32 @@ export class TimelineRecord extends HTMLElement {
         const record = document.createElement('div');
         record.className = 'record';
 
-        // Create header
+        // Create header with time and metadata
         const header = document.createElement('div');
         header.className = 'record-header';
-
-        // Add expand icon
-        const expandIcon = document.createElement('span');
-        expandIcon.className = 'expand-icon';
-        expandIcon.textContent = '+';
-
-        // Add title
-        const title = document.createElement('div');
-        title.className = 'record-title';
-        title.textContent = this.extractTitle();
-
-        const timeAndMeta = document.createElement('div');
-        timeAndMeta.className = 'record-metadata';
 
         const time = document.createElement('div');
         time.className = 'record-time';
         time.textContent = new Date(this.record.createdAt).toLocaleTimeString();
+
+        const metadata = document.createElement('div');
+        metadata.className = 'record-metadata';
 
         const contentSize = this.calculateSize(this.record.content, this.record.type);
         const size = document.createElement('div');
         size.className = 'record-size';
         size.textContent = this.formatSize(contentSize);
 
-        timeAndMeta.appendChild(time);
-
         if (this.record.type === 'audio') {
             const duration = document.createElement('div');
             duration.className = 'record-duration';
             const estimatedDuration = this.estimateAudioDuration(contentSize);
             duration.textContent = this.formatDuration(estimatedDuration);
-            timeAndMeta.appendChild(duration);
+            metadata.appendChild(duration);
         }
 
-        timeAndMeta.appendChild(size);
-
-        header.append(expandIcon, title, timeAndMeta);
+        metadata.appendChild(size);
+        header.append(time, metadata);
 
         // Add content
         const content = await this.renderContent();
@@ -338,25 +260,16 @@ export class TimelineRecord extends HTMLElement {
         const editButton = document.createElement('button');
         editButton.textContent = '✏️';
         editButton.title = 'Edit';
-        editButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.editRecord();
-        });
+        editButton.addEventListener('click', () => this.editRecord());
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '🗑️';
         deleteButton.title = 'Delete';
-        deleteButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.deleteRecord();
-        });
+        deleteButton.addEventListener('click', () => this.deleteRecord());
 
         controls.append(editButton, deleteButton);
-
-        // Add click handler for expansion
-        record.addEventListener('click', () => this.toggleExpanded());
-
         record.append(header, content, controls);
+
         this.shadowRoot.replaceChildren(style, record);
     }
 

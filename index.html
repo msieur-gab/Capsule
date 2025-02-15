@@ -45,6 +45,14 @@
                 <h3>New Record</h3>
                 <button type="button" class="close-button">×</button>
             </header>
+            
+            <div class="datetime-selector">
+                <label>
+                    Record Date/Time:
+                    <input type="datetime-local" name="recordDateTime" required>
+                </label>
+            </div>
+    
             <fieldset>
                 <legend>Record Type</legend>
                 <label>
@@ -60,9 +68,11 @@
                     Image Note
                 </label>
             </fieldset>
+            
             <div class="editor-container">
                 <!-- Editor component will be dynamically inserted here -->
             </div>
+            
             <footer>
                 <button type="submit">Save</button>
                 <button type="button" class="secondary">Cancel</button>
